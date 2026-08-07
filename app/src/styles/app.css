@@ -72,6 +72,10 @@
 .sidebar-nav {
   display: flex;
   flex-direction: column;
+  /* Bleed past the sidebar's 24px left padding so the active highlight and
+     the row dividers span the full sidebar width; the inset is re-applied
+     inside .nav-btn, keeping the numbers aligned with the brand above. */
+  margin-left: -24px;
 }
 
 .nav-btn {
@@ -83,7 +87,7 @@
   font-family: var(--font-heading);
   font-weight: 800;
   font-size: 14px;
-  padding: 11px 12px 11px 0;
+  padding: 11px 12px 11px 24px;
   background: transparent;
   color: var(--color-text);
   border: 0;
