@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Skill, SkillLevel, SkillLink } from "../../data/types";
+import { SkillNotes } from "./SkillNotes";
 
 function tagClassFor(level: SkillLevel) {
   if (level === "Solid") return "tag tag-neutral";
@@ -62,9 +63,20 @@ interface Props {
   onAddLink: (skillName: string, link: LinkFormValues) => void;
   onUpdateLink: (skillName: string, linkId: string, link: LinkFormValues) => void;
   onRemoveLink: (skillName: string, linkId: string) => void;
+  onAddNote: (skillName: string, title: string, body: string) => void;
+  onUpdateNote: (skillName: string, noteId: string, title: string, body: string) => void;
+  onRemoveNote: (skillName: string, noteId: string) => void;
 }
 
-export function SkillCard({ skill, onAddLink, onUpdateLink, onRemoveLink }: Props) {
+export function SkillCard({
+  skill,
+  onAddLink,
+  onUpdateLink,
+  onRemoveLink,
+  onAddNote,
+  onUpdateNote,
+  onRemoveNote,
+}: Props) {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -128,6 +140,14 @@ export function SkillCard({ skill, onAddLink, onUpdateLink, onRemoveLink }: Prop
           + Add resource link
         </button>
       )}
+
+      <SkillNotes
+        skillName={skill.name}
+        notes={skill.notes ?? []}
+        onAddNote={onAddNote}
+        onUpdateNote={onUpdateNote}
+        onRemoveNote={onRemoveNote}
+      />
     </div>
   );
 }

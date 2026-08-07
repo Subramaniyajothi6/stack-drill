@@ -8,6 +8,11 @@ function nextLinkId() {
   return `link-${Date.now()}-${linkIdSeq++}`;
 }
 
+let noteIdSeq = 1;
+function nextNoteId() {
+  return `note-${Date.now()}-${noteIdSeq++}`;
+}
+
 /** Owns the persisted data and every mutation to it. Nothing outside this
  * hook and lib/storage.ts touches localStorage directly. */
 export function useAppState() {
@@ -67,6 +72,54 @@ export function useAppState() {
     }));
   }, []);
 
+  const addSkillNote = useCallback((skillName: string, title: string, body: string) => {
+    const today = todayKey();
+    setData((d) => ({
+      ...d,
+      skills: d.skills.map((sk) =>
+        sk.name === skillName
+          ? {
+              ...sk,
+              // Newest first — the thing you just learned is what you reread.
+              notes: [
+                { id: nextNoteId(), title, body, created: today, updated: today },
+                ...(sk.notes ?? []),
+              ],
+            }
+          : sk
+      ),
+    }));
+  }, []);
+
+  const updateSkillNote = useCallback(
+    (skillName: string, noteId: string, title: string, body: string) => {
+      const today = todayKey();
+      setData((d) => ({
+        ...d,
+        skills: d.skills.map((sk) =>
+          sk.name === skillName
+            ? {
+                ...sk,
+                notes: (sk.notes ?? []).map((n) =>
+                  n.id === noteId ? { ...n, title, body, updated: today } : n
+                ),
+              }
+            : sk
+        ),
+      }));
+    },
+    []
+  );
+
+  const removeSkillNote = useCallback((skillName: string, noteId: string) => {
+    setData((d) => ({
+      ...d,
+      skills: d.skills.map((sk) =>
+        sk.name === skillName ? { ...sk, notes: (sk.notes ?? []).filter((n) => n.id !== noteId) } : sk
+      ),
+    }));
+  }, []);
+
   return {
     data,
     toggleQuest,
@@ -76,5 +129,8 @@ export function useAppState() {
     addSkillLink,
     updateSkillLink,
     removeSkillLink,
+    addSkillNote,
+    updateSkillNote,
+    removeSkillNote,
   };
 }

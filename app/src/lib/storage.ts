@@ -24,7 +24,8 @@ function defaultData(): StoredData {
     fullModeUnlocked: false,
     history: {},
     cleared: Object.fromEntries(PHASES.map((p) => [p.n, false])),
-    skills: SKILLS,
+    // Notes start empty — they're yours to write, nothing is seeded.
+    skills: SKILLS.map((sk) => ({ ...sk, notes: [] })),
   };
 }
 
@@ -44,7 +45,10 @@ export function load(): StoredData {
           ? parsed.history
           : {},
       cleared: { ...fallback.cleared, ...(parsed.cleared ?? {}) },
-      skills: Array.isArray(parsed.skills) && parsed.skills.length ? parsed.skills : fallback.skills,
+      skills:
+        Array.isArray(parsed.skills) && parsed.skills.length
+          ? parsed.skills.map((sk: Skill) => ({ ...sk, notes: sk.notes ?? [] }))
+          : fallback.skills,
     };
   } catch {
     return fallback;

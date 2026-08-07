@@ -21,6 +21,9 @@ export default function App() {
     addSkillLink,
     updateSkillLink,
     removeSkillLink,
+    addSkillNote,
+    updateSkillNote,
+    removeSkillNote,
   } = useAppState();
   const d = useDerived(data, screen);
 
@@ -87,6 +90,9 @@ export default function App() {
             onAddLink={addSkillLink}
             onUpdateLink={updateSkillLink}
             onRemoveLink={removeSkillLink}
+            onAddNote={addSkillNote}
+            onUpdateNote={updateSkillNote}
+            onRemoveNote={removeSkillNote}
           />
         )}
       </main>

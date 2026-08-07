@@ -30,6 +30,10 @@ is pre-seeded or faked.
   fight" milestone, and a mark-cleared toggle.
 - **Skills & resources** — every skill in the stack with editable
   resource links: add, edit, or delete your own docs/course/video links.
+  Each skill also has a **My notes** section for your own learning notes —
+  write your version of a concept once, glance at it later instead of
+  relearning it from the docs. Indent a line by two spaces to format it as
+  a code block.
 
 ## Tech stack
 
