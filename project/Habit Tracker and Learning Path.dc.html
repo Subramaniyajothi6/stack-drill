@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_ds/modernist-3da139e2-4907-451a-a3bc-f63451240362/styles.css">
+<script src="_ds/modernist-3da139e2-4907-451a-a3bc-f63451240362/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap">
+<style>
+  body { margin: 0; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-700); }
+</style>
+</helmet>
+
+<div style="display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body);">
+
+  <aside style="border-right: 2px solid var(--color-divider); padding: 24px 0 24px 24px; display: flex; flex-direction: column; gap: 24px; position: sticky; top: 0; height: 100vh; box-sizing: border-box;">
+    <div>
+      <div style="font-family: var(--font-heading); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; line-height: 1;">STACK<span style="color: var(--color-accent);">/</span>DRILL</div>
+      <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600); margin-top: 6px;">Habits + 20-week path</div>
+    </div>
+
+    <nav style="display: flex; flex-direction: column;">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+        <button onClick="{{ item.go }}" style="display: grid; grid-template-columns: 22px 1fr; align-items: center; gap: 10px; text-align: left; font-family: var(--font-heading); font-weight: 800; font-size: 14px; padding: 11px 12px 11px 0; background: {{ item.bg }}; color: {{ item.color }}; border: 0; border-bottom: 1px solid var(--color-neutral-300); cursor: pointer;" style-hover="background: var(--color-neutral-200);">
+          <span style="font-size: 10px; letter-spacing: 0.08em; color: var(--color-neutral-600);">{{ item.num }}</span>
+          <span>{{ item.label }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top: auto; padding-right: 24px;">
+      <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">Level {{ level }} · {{ levelTitle }}</div>
+      <div style="font-family: var(--font-heading); font-weight: 800; font-size: 30px; line-height: 1.05; margin-top: 4px;">{{ xp }} XP</div>
+      <div style="height: 10px; background: var(--color-neutral-300); margin-top: 10px;">
+        <div style="height: 10px; width: {{ levelPct }}%; background: var(--color-accent);"></div>
+      </div>
+      <div style="font-size: 12px; color: var(--color-neutral-700); margin-top: 6px;">{{ xpToNext }} XP to level {{ nextLevel }}</div>
+    </div>
+  </aside>
+
+  <main style="min-width: 0;">
+
+    <header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 24px 32px 16px; border-bottom: 2px solid var(--color-divider); flex-wrap: wrap;">
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">{{ screenKicker }}</div>
+        <h1 style="font-size: 38px; margin: 4px 0 0;">{{ screenTitle }}</h1>
+      </div>
+      <div style="display: flex; gap: 32px; align-items: flex-end;">
+        <div>
+          <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">Streak</div>
+          <div style="font-family: var(--font-heading); font-weight: 800; font-size: 28px; line-height: 1;">{{ streak }} days</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">Today</div>
+          <div style="font-family: var(--font-heading); font-weight: 800; font-size: 28px; line-height: 1;">{{ doneCount }}/{{ questCount }}</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">Freeze tokens</div>
+          <div style="font-family: var(--font-heading); font-weight: 800; font-size: 28px; line-height: 1;">{{ freezes }}</div>
+        </div>
+      </div>
+    </header>
+
+    <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+      <div style="display: grid; grid-template-columns: 1.35fr 1fr; align-items: start;">
+
+        <section style="border-right: 2px solid var(--color-divider); padding: 24px 32px 40px;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px;">
+            <h3 style="font-size: 20px; margin: 0;">Daily quest list</h3>
+            <span style="font-size: 12px; color: var(--color-neutral-700);">{{ plannedHours }}h planned · {{ loggedHours }}h logged</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column;">
+            <sc-for list="{{ quests }}" as="q" hint-placeholder-count="7">
+              <button onClick="{{ q.toggle }}" style="display: grid; grid-template-columns: 26px 1fr auto; gap: 14px; align-items: center; text-align: left; padding: 14px 4px; border: 0; border-bottom: 1px solid var(--color-neutral-300); background: transparent; cursor: pointer; font-family: var(--font-body); color: var(--color-text);" style-hover="background: var(--color-neutral-200);">
+                <span style="width: 22px; height: 22px; border: 2px solid var(--color-text); background: {{ q.boxBg }}; color: var(--color-bg); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;">{{ q.mark }}</span>
+                <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                  <span style="font-family: var(--font-heading); font-weight: 800; font-size: 16px; text-decoration: {{ q.strike }}; color: {{ q.titleColor }};">{{ q.title }}</span>
+                  <span style="font-size: 12.5px; color: var(--color-neutral-700);">{{ q.detail }}</span>
+                </span>
+                <span style="display: flex; align-items: center; gap: 10px;">
+                  <span class="tag tag-outline" style="font-size: 11px;">{{ q.slot }}</span>
+                  <span style="font-family: var(--font-heading); font-weight: 800; font-size: 13px; color: var(--color-accent-700); min-width: 56px; text-align: right;">+{{ q.xp }} XP</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+
+          <div style="margin-top: 28px; border: 2px solid var(--color-divider); padding: 18px 20px;">
+            <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">Coach</div>
+            <p style="margin: 6px 0 0; font-size: 15px; max-width: 62ch; text-wrap: pretty;">{{ coachLine }}</p>
+          </div>
+
+          <h3 style="font-size: 20px; margin: 32px 0 0; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px;">Missed the target? Pick a smaller win</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-left: 1px solid var(--color-neutral-300);">
+            <sc-for list="{{ fallbacks }}" as="f" hint-placeholder-count="4">
+              <div style="padding: 16px 18px; border-right: 1px solid var(--color-neutral-300); border-bottom: 1px solid var(--color-neutral-300);">
+                <div style="font-family: var(--font-heading); font-weight: 800; font-size: 15px;">{{ f.title }}</div>
+                <div style="font-size: 12.5px; color: var(--color-neutral-700); margin-top: 4px; text-wrap: pretty;">{{ f.body }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 28px;">
+          <div>
+            <h3 style="font-size: 20px; margin: 0 0 8px; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px;">This week: {{ currentPhaseWeeks }}</h3>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 24px; line-height: 1.1;">{{ currentPhaseTitle }}</div>
+            <p style="font-size: 13.5px; color: var(--color-neutral-700); margin: 8px 0 0; text-wrap: pretty;">{{ currentPhaseWhy }}</p>
+            <div style="margin-top: 14px; background: var(--color-accent); color: var(--color-bg); padding: 16px 18px;">
+              <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85;">Boss fight</div>
+              <div style="font-family: var(--font-heading); font-weight: 800; font-size: 17px; line-height: 1.2; margin-top: 4px;">{{ currentBoss }}</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="font-size: 20px; margin: 0 0 8px; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px;">Weak spots</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <sc-for list="{{ weakSpots }}" as="w" hint-placeholder-count="4">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+                    <span style="font-family: var(--font-heading); font-weight: 800; font-size: 14px;">{{ w.name }}</span>
+                    <span style="font-size: 12px; color: var(--color-neutral-700);">{{ w.note }}</span>
+                  </div>
+                  <div style="height: 8px; background: var(--color-neutral-300); margin-top: 6px;">
+                    <div style="height: 8px; width: {{ w.pct }}%; background: var(--color-accent);"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="font-size: 20px; margin: 0 0 8px; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px;">Today's block plan · {{ plannedHours }}h</h3>
+            <div style="display: flex; flex-direction: column;">
+              <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="5">
+                <div style="display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-neutral-300); font-size: 13.5px;">
+                  <span style="font-variant-numeric: tabular-nums; color: var(--color-neutral-700);">{{ b.time }}</span>
+                  <span style="font-weight: 500;">{{ b.what }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isStreaks }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 36px;">
+        <section>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px;">
+            <h3 style="font-size: 20px; margin: 0;">140 days of work</h3>
+            <span style="font-size: 12px; color: var(--color-neutral-700);">{{ heatSummary }}</span>
+          </div>
+          <div style="display: flex; gap: 4px; margin-top: 16px; overflow-x: auto; padding-bottom: 4px;">
+            <sc-for list="{{ heatWeeks }}" as="w" hint-placeholder-count="20">
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <sc-for list="{{ w.days }}" as="d" hint-placeholder-count="7">
+                  <div title="{{ d.title }}" style="width: 22px; height: 22px; background: {{ d.bg }}; border: 1px solid var(--color-neutral-300);"></div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12px; color: var(--color-neutral-700);">
+            <span>Nothing</span>
+            <sc-for list="{{ heatLegend }}" as="l" hint-placeholder-count="5">
+              <div style="width: 18px; height: 18px; background: {{ l.bg }}; border: 1px solid var(--color-neutral-300);"></div>
+            </sc-for>
+            <span>Full 6h day</span>
+          </div>
+        </section>
+
+        <section style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 0; border-top: 2px solid var(--color-divider);">
+          <div style="padding: 24px 32px 24px 0; border-right: 2px solid var(--color-divider);">
+            <h3 style="font-size: 20px; margin: 0 0 12px;">Badges</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); border-left: 1px solid var(--color-neutral-300);">
+              <sc-for list="{{ badges }}" as="b" hint-placeholder-count="6">
+                <div style="padding: 16px 18px; border-right: 1px solid var(--color-neutral-300); border-bottom: 1px solid var(--color-neutral-300); opacity: {{ b.opacity }};">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px;">
+                    <span style="font-family: var(--font-heading); font-weight: 800; font-size: 15px;">{{ b.name }}</span>
+                    <span class="{{ b.tagClass }}" style="font-size: 10px;">{{ b.state }}</span>
+                  </div>
+                  <div style="font-size: 12.5px; color: var(--color-neutral-700); margin-top: 4px; text-wrap: pretty;">{{ b.how }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="padding: 24px 0 24px 32px;">
+            <sc-if value="{{ showBoard }}" hint-placeholder-val="{{ true }}">
+              <h3 style="font-size: 20px; margin: 0 0 12px;">Build club · week {{ currentWeek }}</h3>
+              <table class="table" style="width: 100%;">
+                <thead>
+                  <tr><th style="text-align: left;">#</th><th style="text-align: left;">Who</th><th style="text-align: left;">Streak</th><th style="text-align: right;">XP</th></tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ leaders }}" as="p" hint-placeholder-count="6">
+                    <tr style="background: {{ p.rowBg }};">
+                      <td>{{ p.rank }}</td>
+                      <td style="font-weight: {{ p.weight }};">{{ p.name }}</td>
+                      <td>{{ p.streak }}d</td>
+                      <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ p.xp }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              <p style="font-size: 12.5px; color: var(--color-neutral-700); margin-top: 12px; text-wrap: pretty;">Weekly reset on Monday. Lowest XP picks next week's group build topic — losing is still shipping.</p>
+            </sc-if>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRoadmap }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 24px 32px 48px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px; gap: 16px; flex-wrap: wrap;">
+          <h3 style="font-size: 20px; margin: 0;">Eight phases, {{ hoursTotal }} hours, one freelance-ready stack</h3>
+          <span style="font-size: 12px; color: var(--color-neutral-700);">{{ phasesDone }} of 8 phases cleared · tap a phase to mark it</span>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <sc-for list="{{ phases }}" as="p" hint-placeholder-count="8">
+            <div style="display: grid; grid-template-columns: 150px 1fr 300px; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--color-neutral-300); background: {{ p.rowBg }};">
+              <div>
+                <div style="font-family: var(--font-heading); font-weight: 800; font-size: 34px; line-height: 1; color: {{ p.numColor }};">{{ p.n }}</div>
+                <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-neutral-700); margin-top: 6px;">{{ p.weeks }}</div>
+                <div style="font-size: 12px; color: var(--color-neutral-700);">{{ p.hours }} · {{ p.xp }} XP</div>
+                <button onClick="{{ p.toggle }}" class="btn btn-secondary" style="margin-top: 10px; justify-content: flex-start; width: 100%;">{{ p.btnLabel }}</button>
+              </div>
+              <div>
+                <div style="font-family: var(--font-heading); font-weight: 800; font-size: 22px; line-height: 1.15;">{{ p.title }}</div>
+                <p style="font-size: 13.5px; color: var(--color-neutral-700); margin: 6px 0 12px; max-width: 60ch; text-wrap: pretty;">{{ p.why }}</p>
+                <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 14px;">
+                  <sc-for list="{{ p.tasks }}" as="t" hint-placeholder-count="3">
+                    <li>{{ t }}</li>
+                  </sc-for>
+                </ul>
+              </div>
+              <div style="border: 2px solid var(--color-divider); padding: 14px 16px; align-self: start;">
+                <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700);">Boss fight</div>
+                <div style="font-family: var(--font-heading); font-weight: 800; font-size: 15px; line-height: 1.25; margin-top: 4px;">{{ p.boss }}</div>
+                <div style="font-size: 12.5px; color: var(--color-neutral-700); margin-top: 8px;">Client-facing proof: {{ p.proof }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSkills }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 24px 32px 48px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px; gap: 16px; flex-wrap: wrap;">
+          <h3 style="font-size: 20px; margin: 0;">What you know, what's next, and exactly where to learn it</h3>
+          <span style="font-size: 12px; color: var(--color-neutral-700);">Docs · course · watch — three links per skill, no rabbit holes</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); border-left: 1px solid var(--color-neutral-300);">
+          <sc-for list="{{ skills }}" as="s" hint-placeholder-count="12">
+            <div style="padding: 20px 22px; border-right: 1px solid var(--color-neutral-300); border-bottom: 1px solid var(--color-neutral-300); display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
+                <span style="font-family: var(--font-heading); font-weight: 800; font-size: 18px;">{{ s.name }}</span>
+                <span class="{{ s.tagClass }}" style="font-size: 10px;">{{ s.level }}</span>
+              </div>
+              <div style="font-size: 13px; color: var(--color-neutral-700); text-wrap: pretty;">{{ s.note }}</div>
+              <div style="display: flex; flex-direction: column;">
+                <sc-for list="{{ s.links }}" as="l" hint-placeholder-count="3">
+                  <a href="{{ l.url }}" target="_blank" rel="noopener" style="display: grid; grid-template-columns: 62px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--color-neutral-300); font-size: 13.5px; text-decoration: none; color: var(--color-text);" style-hover="color: var(--color-accent-700);">
+                    <span style="font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-neutral-600); padding-top: 3px;">{{ l.kind }}</span>
+                    <span style="font-weight: 500;">{{ l.label }}</span>
+                  </a>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 32px; display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="width: 390px; border: 2px solid var(--color-text); background: var(--color-bg); padding: 0 0 20px;">
+          <div style="display: flex; justify-content: space-between; padding: 10px 16px; font-size: 11px; letter-spacing: 0.06em; border-bottom: 2px solid var(--color-divider);">
+            <span>9:41</span><span>{{ streak }}-DAY STREAK</span>
+          </div>
+          <div style="padding: 18px 16px 12px; border-bottom: 2px solid var(--color-divider);">
+            <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">Level {{ level }} · {{ xp }} XP</div>
+            <h2 style="font-size: 28px; margin: 4px 0 10px;">{{ doneCount }} of {{ questCount }} done</h2>
+            <div style="height: 10px; background: var(--color-neutral-300);">
+              <div style="height: 10px; width: {{ todayPct }}%; background: var(--color-accent);"></div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column;">
+            <sc-for list="{{ quests }}" as="q" hint-placeholder-count="7">
+              <button onClick="{{ q.toggle }}" style="display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; align-items: center; text-align: left; min-height: 60px; padding: 12px 16px; border: 0; border-bottom: 1px solid var(--color-neutral-300); background: transparent; cursor: pointer; font-family: var(--font-body); color: var(--color-text);">
+                <span style="width: 24px; height: 24px; border: 2px solid var(--color-text); background: {{ q.boxBg }}; color: var(--color-bg); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800;">{{ q.mark }}</span>
+                <span style="display: flex; flex-direction: column;">
+                  <span style="font-family: var(--font-heading); font-weight: 800; font-size: 15px; text-decoration: {{ q.strike }}; color: {{ q.titleColor }};">{{ q.title }}</span>
+                  <span style="font-size: 12px; color: var(--color-neutral-700);">{{ q.slot }} · +{{ q.xp }} XP</span>
+                </span>
+                <span style="font-size: 11px; color: var(--color-neutral-600);">{{ q.short }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="padding: 16px;">
+            <button class="btn btn-primary btn-block" style="justify-content: flex-start;">Log a 25-minute sprint</button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); border-top: 2px solid var(--color-divider); padding-top: 12px;">
+            <sc-for list="{{ mobileTabs }}" as="t" hint-placeholder-count="4">
+              <div style="text-align: left; padding: 0 12px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{ t.color }}; font-weight: 800;">{{ t.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="max-width: 420px; display: flex; flex-direction: column; gap: 18px;">
+          <div>
+            <h3 style="font-size: 20px; margin: 0 0 6px; border-bottom: 2px solid var(--color-divider); padding-bottom: 8px;">Phone rules</h3>
+            <p style="font-size: 14px; margin: 0; text-wrap: pretty;">The phone is only for check-offs and the 25-minute sprint timer. Planning, roadmap edits and resource reading stay on desktop — that's what keeps the phone from becoming another feed.</p>
+          </div>
+          <div style="border: 2px solid var(--color-divider); padding: 16px 18px;">
+            <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-600);">Notification, 9pm</div>
+            <p style="margin: 6px 0 0; font-size: 15px; text-wrap: pretty;">{{ nudge }}</p>
+          </div>
+          <div style="background: var(--color-accent); color: var(--color-bg); padding: 18px 20px;">
+            <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85;">Streak insurance</div>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 20px; line-height: 1.2; margin-top: 4px;">One 15-minute quest keeps the streak alive. Use a freeze token only when the day is genuinely gone.</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;dailyHours&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:6,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:1,&quot;max&quot;:12,&quot;unit&quot;:&quot;h&quot;,&quot;section&quot;:&quot;Plan&quot;},&quot;freezeTokens&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:0,&quot;max&quot;:6,&quot;section&quot;:&quot;Plan&quot;},&quot;showLeaderboard&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motivation&quot;}}">
+const ACCENT = "#ec3013";
+const A100 = "#fff2ef", A300 = "#ffc4b8", A500 = "#ff563c", A700 = "#ae1800";
+
+const QUESTS = [
+  { id: "build", title: "Deep build block — 2h", detail: "Ship a real feature on the current phase project. No tutorials in this block.", slot: "07:30", short: "2h", xp: 120 },
+  { id: "learn", title: "New concept — 1.5h", detail: "Read the docs page for today's topic, then rewrite the example from memory.", slot: "10:00", short: "1.5h", xp: 90 },
+  { id: "dsa", title: "DSA — 2 problems", detail: "One pattern per day. Write the brute force, then optimise out loud.", slot: "14:00", short: "45m", xp: 80 },
+  { id: "apply", title: "Apply it — 1h", detail: "Use today's concept inside the project, however ugly. Understanding follows use.", slot: "16:00", short: "1h", xp: 70 },
+  { id: "ship", title: "Public commit or post", detail: "Push, or post one screenshot with what you learned. This is your freelance proof.", slot: "20:00", short: "15m", xp: 50 },
+  { id: "review", title: "10-minute review", detail: "What broke today, what you'll do first tomorrow. Two lines, no more.", slot: "21:30", short: "10m", xp: 30 },
+  { id: "sleep", title: "Screens off by 23:30", detail: "The 07:30 build block is only real if this one is.", slot: "23:30", short: "—", xp: 40 }
+];
+
+const PHASES = [
+  { n: "01", weeks: "Weeks 1–3", hours: "90h", xp: 900, title: "TypeScript, properly", why: "Almost every paid React/Node contract is TypeScript now. Coming from JS this is your fastest rate increase, so it goes first.", tasks: ["Handbook: narrowing, generics, utility types, discriminated unions", "Convert one existing MERN repo to strict TS, front to back", "Validate every API edge with Zod instead of trusting types"], boss: "Your old project running in strict mode with zero `any`.", proof: "A typed repo you can hand a client to read." },
+  { n: "02", weeks: "Weeks 4–6", hours: "90h", xp: 950, title: "Next.js: App Router, server actions, auth", why: "Clients ask for Next by name. Server components change how you think about data fetching, so give it real weeks, not a weekend.", tasks: ["Official Learn course end to end, typed", "Rebuild one React SPA as App Router with server actions", "Auth, protected routes, image + metadata, deploy to Vercel"], boss: "A live, SEO-clean Next app with login and a real database behind it.", proof: "A URL you can put at the top of a proposal." },
+  { n: "03", weeks: "Weeks 7–8", hours: "60h", xp: 700, title: "Postgres + Drizzle ORM", why: "You know Mongo. Most agency work is relational. Knowing both, and being able to argue for one, is what a senior freelancer does.", tasks: ["SQL fundamentals: joins, indexes, transactions, EXPLAIN", "Drizzle schema, relations, migrations on Neon or Supabase", "Migrate one Mongoose model set to Postgres and compare queries"], boss: "Same app, both databases, a written note on which you'd bill for and why.", proof: "A short write-up — instant credibility on calls." },
+  { n: "04", weeks: "Weeks 9–10", hours: "60h", xp: 700, title: "DSA sprint + portfolio", why: "Your weakest area by your own read. Two focused weeks on patterns beats a year of random problems.", tasks: ["Arrays, two pointers, hashing, sliding window, trees, graphs, DP intro", "Two problems a day, one pattern a day, always explain the trade-off", "Build the portfolio + services page while your best work is fresh"], boss: "50 problems logged with pattern notes, and a portfolio that states your rate.", proof: "The site that actually gets you replies." },
+  { n: "05", weeks: "Weeks 11–12", hours: "60h", xp: 750, title: "AWS + shipping like a professional", why: "Deployment is where freelance projects die. Owning the deploy means you can charge for maintenance, not just code.", tasks: ["S3, CloudFront, EC2, RDS, Lambda, IAM basics — build, don't watch", "Dockerise one app; GitHub Actions for test and deploy", "Logs, env secrets, backups, a rollback you have actually run"], boss: "One app deployed on AWS with CI/CD and a rollback you tested on purpose.", proof: "You can now quote hosting and upkeep monthly." },
+  { n: "06", weeks: "Weeks 13–15", hours: "90h", xp: 850, title: "Python + FastAPI", why: "Python is the door to everything AI. Learn it as a working backend dev, not from zero — you already know how servers behave.", tasks: ["Python syntax, typing, virtualenvs, pytest — one week, fast", "FastAPI service with Pydantic models and Postgres", "Call it from your Next app; async, background tasks, file uploads"], boss: "A Python service your Next app depends on in production.", proof: "You are now billable in two backend languages." },
+  { n: "07", weeks: "Weeks 16–18", hours: "90h", xp: 1000, title: "AI, RAG and the money features", why: "This is the highest-paying thing a small freelancer can offer right now: a chatbot that actually knows a client's documents.", tasks: ["Embeddings, chunking, vector search with pgvector", "RAG pipeline: ingest, retrieve, rerank, cite, evaluate", "Streaming responses, cost and token budgets, prompt versioning"], boss: "\"Chat with your docs\" for a real business — uploads, citations, guardrails.", proof: "The demo you can sell for five figures." },
+  { n: "08", weeks: "Weeks 19–20", hours: "60h", xp: 900, title: "PyTorch basics + capstone", why: "Enough PyTorch to read papers and fine-tune small models, then one flagship build that ties the whole stack together.", tasks: ["Tensors, autograd, training loop, fine-tune a small model", "Capstone: Next + TS + FastAPI + Postgres + RAG, deployed on AWS", "Write the case study: problem, decisions, numbers, what you'd charge"], boss: "Capstone live, case study published, three cold proposals sent.", proof: "First paid client conversation." }
+];
+
+const SKILLS = [
+  { name: "HTML & CSS", level: "Solid", note: "Keep it warm — do layout from scratch occasionally instead of reaching for a component.", links: [["Docs", "MDN CSS layout guide", "https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout"], ["Practice", "Flexbox Froggy + Grid Garden", "https://flexboxfroggy.com/"], ["Watch", "Kevin Powell — CSS", "https://www.youtube.com/@KevinPowell"]] },
+  { name: "JavaScript", level: "Solid", note: "Shore up async, closures and the event loop before TypeScript, or TS errors will feel random.", links: [["Docs", "MDN JavaScript guide", "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide"], ["Book", "You Don't Know JS Yet", "https://github.com/getify/You-Dont-Know-JS"], ["Watch", "JS event loop, Jake Archibald", "https://www.youtube.com/watch?v=cCOL7MC4Pl0"]] },
+  { name: "React", level: "Solid", note: "Read the new docs even though you know React — the mental model chapters fix subtle habits.", links: [["Docs", "react.dev learn", "https://react.dev/learn"], ["Deep dive", "React Query for server state", "https://tanstack.com/query/latest/docs/framework/react/overview"], ["Watch", "Jack Herrington", "https://www.youtube.com/@jherr"]] },
+  { name: "Tailwind", level: "Solid", note: "Learn the config and @apply boundaries so client codebases stay tidy.", links: [["Docs", "Tailwind docs", "https://tailwindcss.com/docs"], ["Patterns", "Tailwind UI patterns", "https://tailwindcss.com/plus/ui-blocks"], ["Watch", "Tailwind Labs channel", "https://www.youtube.com/@TailwindLabs"]] },
+  { name: "Node + Express", level: "Solid", note: "Next step is error handling, rate limiting and structured logging — the boring things clients pay for.", links: [["Docs", "Node.js docs", "https://nodejs.org/en/docs"], ["Guide", "Express production best practices", "https://expressjs.com/en/advanced/best-practice-performance.html"], ["Course", "Node.js, freeCodeCamp", "https://www.youtube.com/watch?v=Oe421EPjeBE"]] },
+  { name: "MongoDB + Mongoose", level: "Solid", note: "Add indexes and the aggregation pipeline; that's the difference between a demo and a product.", links: [["Docs", "Mongoose guides", "https://mongoosejs.com/docs/guide.html"], ["Course", "MongoDB University free courses", "https://learn.mongodb.com/"], ["Reference", "Aggregation pipeline", "https://www.mongodb.com/docs/manual/aggregation/"]] },
+  { name: "TypeScript", level: "Next up", note: "Phase 01. Do not read all of it — learn 20% and convert a real repo.", links: [["Docs", "TS Handbook", "https://www.typescriptlang.org/docs/handbook/intro.html"], ["Course", "Total TypeScript free tutorials", "https://www.totaltypescript.com/tutorials"], ["Watch", "Matt Pocock", "https://www.youtube.com/@mattpocockuk"]] },
+  { name: "Next.js", level: "Next up", note: "Phase 02. The official course is genuinely the best resource; do it typed.", links: [["Docs", "Next.js Learn", "https://nextjs.org/learn"], ["Reference", "App Router docs", "https://nextjs.org/docs/app"], ["Watch", "Vercel channel", "https://www.youtube.com/@VercelHQ"]] },
+  { name: "Postgres + Drizzle", level: "Next up", note: "Phase 03. Free tier on Neon, no local setup pain.", links: [["Docs", "Drizzle ORM docs", "https://orm.drizzle.team/docs/overview"], ["Practice", "PostgreSQL Exercises", "https://pgexercises.com/"], ["Course", "SQL, Mode analytics tutorial", "https://mode.com/sql-tutorial/"]] },
+  { name: "DSA", level: "Weak spot", note: "Phase 04. Patterns, not problem count. Log every one with the pattern name.", links: [["Course", "NeetCode roadmap", "https://neetcode.io/roadmap"], ["Practice", "LeetCode top interview 150", "https://leetcode.com/studyplan/top-interview-150/"], ["Book", "Open Data Structures, free", "https://opendatastructures.org/"]] },
+  { name: "AWS + DevOps", level: "Weak spot", note: "Phase 05. Set a billing alarm on day one, then build small things for real.", links: [["Docs", "AWS Skill Builder free tier", "https://skillbuilder.aws/"], ["Course", "AWS Cloud Practitioner, freeCodeCamp", "https://www.youtube.com/watch?v=SOTamWNgDKc"], ["Guide", "Docker getting started", "https://docs.docker.com/get-started/"]] },
+  { name: "Python", level: "New", note: "Phase 06. One week of syntax, then straight into FastAPI — you already know backends.", links: [["Docs", "Python tutorial", "https://docs.python.org/3/tutorial/"], ["Docs", "FastAPI tutorial", "https://fastapi.tiangolo.com/tutorial/"], ["Course", "Real Python basics path", "https://realpython.com/learning-paths/python-basics/"]] },
+  { name: "AI, ML & RAG", level: "New", note: "Phase 07. Ship a RAG app before touching theory; the theory sticks better afterwards.", links: [["Course", "Hugging Face LLM course", "https://huggingface.co/learn/llm-course"], ["Docs", "LangChain RAG tutorial", "https://python.langchain.com/docs/tutorials/rag/"], ["Watch", "Andrej Karpathy — LLM intro", "https://www.youtube.com/watch?v=zjkBMFhNj_g"]] },
+  { name: "PyTorch", level: "New", note: "Phase 08. Enough to fine-tune and to read a paper without panic.", links: [["Docs", "PyTorch tutorials", "https://pytorch.org/tutorials/"], ["Course", "fast.ai practical deep learning", "https://course.fast.ai/"], ["Watch", "Karpathy — building makemore", "https://www.youtube.com/watch?v=PaCmpygFfXo"]] }
+];
+
+const WEAK = [
+  { name: "DSA", pct: 24, note: "12 of 50 problems" },
+  { name: "AWS / deployment", pct: 15, note: "Phase 05, not started" },
+  { name: "TypeScript generics", pct: 45, note: "Shaky under pressure" },
+  { name: "Writing tests", pct: 20, note: "Skipped 4 weeks running" }
+];
+
+const FALLBACKS = [
+  { title: "The 15-minute rule", body: "Can't do 2 hours? Do 15 minutes on the same task. It counts, the streak lives, momentum survives." },
+  { title: "Swap, don't skip", body: "Bad energy day? Trade the build block for a DSA problem or a docs read. Any quest keeps the day green." },
+  { title: "Freeze token", body: "Two per month. Travel, illness, family — spend one guilt-free instead of breaking a 47-day streak." },
+  { title: "Sunday catch-up", body: "Sunday is deliberately empty. Missed hours land there, capped at 3 — never repay a whole week." }
+];
+
+const BADGES = [
+  { name: "First blood", how: "Ship your first public commit.", earned: true },
+  { name: "Iron week", how: "Seven green days in a row.", earned: true },
+  { name: "Typed", how: "Clear the TypeScript boss fight.", earned: true },
+  { name: "Deployed", how: "One app live on AWS with CI/CD.", earned: false },
+  { name: "Pattern hunter", how: "50 DSA problems, each with a pattern note.", earned: false },
+  { name: "First invoice", how: "Send a proposal and get paid once.", earned: false }
+];
+
+const LEADERS = [
+  { rank: 1, name: "Ishan", streak: 61, xp: "6,140" },
+  { rank: 2, name: "You", streak: 47, xp: "4,820", me: true },
+  { rank: 3, name: "Priya", streak: 44, xp: "4,610" },
+  { rank: 4, name: "Dev", streak: 22, xp: "3,180" },
+  { rank: 5, name: "Ananya", streak: 18, xp: "2,940" },
+  { rank: 6, name: "Rohit", streak: 9, xp: "1,505" }
+];
+
+const BLOCKS = [
+  { time: "07:30–09:30", what: "Deep build block — current phase project" },
+  { time: "10:00–11:30", what: "New concept: docs, then rebuild from memory" },
+  { time: "14:00–14:45", what: "DSA — two problems, one pattern" },
+  { time: "16:00–17:00", what: "Apply today's concept in the project" },
+  { time: "20:00–20:15", what: "Commit, push, post one screenshot" },
+  { time: "21:30–21:40", what: "Two-line review, set tomorrow's first task" }
+];
+
+const SCREENS = {
+  today: ["Day 47 · Week 5 of 20", "Today"],
+  streaks: ["Consistency beats intensity", "Streaks, XP & badges"],
+  roadmap: ["JS/MERN → freelance-ready in 20 weeks", "The roadmap"],
+  skills: ["Your stack, honestly assessed", "Skills & resources"],
+  mobile: ["Same data, pocket version", "On your phone"]
+};
+
+class Component extends DCLogic {
+  state = {
+    screen: "today",
+    done: { build: true, learn: true, dsa: false, apply: false, ship: false, review: false, sleep: false },
+    cleared: { "01": true, "02": true, "03": false, "04": false, "05": false, "06": false, "07": false, "08": false }
+  };
+
+  tagFor(level) {
+    if (level === "Solid") return "tag tag-neutral";
+    if (level === "Weak spot") return "tag tag-accent";
+    return "tag tag-outline";
+  }
+
+  heat() {
+    let seed = 7;
+    const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+    const weeks = [], steps = ["transparent", A100, A300, A500, ACCENT, A700];
+    let green = 0;
+    for (let w = 0; w < 20; w++) {
+      const days = [];
+      for (let d = 0; d < 7; d++) {
+        const late = w > 12;
+        let lvl = Math.min(5, Math.max(0, Math.round(rnd() * 4 + (late ? 1.4 : 0.4))));
+        if (d === 6 && rnd() > 0.55) lvl = Math.max(0, lvl - 2);
+        if (w === 19 && d > 3) lvl = 0;
+        if (lvl > 0) green++;
+        days.push({ bg: steps[lvl], title: "Week " + (w + 1) + " · " + (lvl === 0 ? "missed" : lvl * 1.2 + "h logged") });
+      }
+      weeks.push({ days });
+    }
+    return { weeks, green, legend: steps.slice(1).map(s => ({ bg: s })) };
+  }
+
+  renderVals() {
+    const s = this.state, screen = s.screen;
+    const [kicker, title] = SCREENS[screen];
+
+    const quests = QUESTS.map(q => {
+      const on = !!s.done[q.id];
+      return Object.assign({}, q, {
+        mark: on ? "✓" : "",
+        boxBg: on ? ACCENT : "transparent",
+        strike: on ? "line-through" : "none",
+        titleColor: on ? "var(--color-neutral-600)" : "var(--color-text)",
+        toggle: () => this.setState(st => ({ done: Object.assign({}, st.done, { [q.id]: !st.done[q.id] }) }))
+      });
+    });
+    const doneQ = quests.filter(q => s.done[q.id]);
+    const earnedXp = doneQ.reduce((a, q) => a + q.xp, 0);
+    const xpNum = 4560 + earnedXp;
+    const level = 7 + (xpNum >= 5000 ? 1 : 0);
+    const floor = level * 700, next = (level + 1) * 700;
+
+    const heat = this.heat();
+    const clearedCount = Object.keys(s.cleared).filter(k => s.cleared[k]).length;
+
+    const coach = doneQ.length === 0
+      ? "Nothing checked yet. Open the project and do fifteen minutes — the rest of the day follows the first block, not your mood."
+      : doneQ.length < 4
+        ? "Two blocks in and it's still morning. DSA is the one you skip most, so take it next while you're warm."
+        : doneQ.length < QUESTS.length
+          ? "Strong day. Everything left is under an hour — finish the commit and the review, then stop guilt-free."
+          : "Full green day, 47 in a row. Write tomorrow's first task down now, close the laptop, and let the streak do the motivating.";
+
+    return {
+      navItems: Object.keys(SCREENS).map((k, i) => ({
+        num: "0" + (i + 1),
+        label: SCREENS[k][1],
+        bg: screen === k ? "var(--color-accent)" : "transparent",
+        color: screen === k ? "var(--color-bg)" : "var(--color-text)",
+        go: () => this.setState({ screen: k })
+      })),
+      isToday: screen === "today", isStreaks: screen === "streaks",
+      isRoadmap: screen === "roadmap", isSkills: screen === "skills", isMobile: screen === "mobile",
+      screenKicker: kicker, screenTitle: title,
+      streak: 47, freezes: this.props.freezeTokens ?? 2,
+      xp: xpNum.toLocaleString(), level, nextLevel: level + 1, levelTitle: "Full-stack, going independent",
+      levelPct: Math.round(((xpNum - floor) / (next - floor)) * 100),
+      xpToNext: next - xpNum,
+      quests, questCount: QUESTS.length, doneCount: doneQ.length,
+      todayPct: Math.round((doneQ.length / QUESTS.length) * 100),
+      plannedHours: this.props.dailyHours ?? 6,
+      loggedHours: (doneQ.length * 0.9).toFixed(1),
+      coachLine: coach,
+      fallbacks: FALLBACKS, blocks: BLOCKS, weakSpots: WEAK, currentWeek: 5,
+      currentPhaseWeeks: PHASES[1].weeks, currentPhaseTitle: PHASES[1].title,
+      currentPhaseWhy: PHASES[1].why, currentBoss: PHASES[1].boss,
+      heatWeeks: heat.weeks, heatLegend: heat.legend,
+      heatSummary: heat.green + " active days · 47-day current streak · longest 47",
+      badges: BADGES.map(b => ({
+        name: b.name, how: b.how,
+        state: b.earned ? "Earned" : "Locked",
+        tagClass: b.earned ? "tag tag-accent" : "tag tag-outline",
+        opacity: b.earned ? 1 : 0.5
+      })),
+      showBoard: this.props.showLeaderboard ?? true,
+      leaders: LEADERS.map(p => ({
+        rank: p.rank, name: p.name, streak: p.streak, xp: p.xp,
+        rowBg: p.me ? "var(--color-accent-100)" : "transparent",
+        weight: p.me ? 800 : 400
+      })),
+      phases: PHASES.map(p => ({
+        n: p.n, weeks: p.weeks, hours: p.hours, xp: p.xp, title: p.title, why: p.why,
+        tasks: p.tasks, boss: p.boss, proof: p.proof,
+        rowBg: s.cleared[p.n] ? "var(--color-accent-100)" : "transparent",
+        numColor: s.cleared[p.n] ? ACCENT : "var(--color-neutral-400)",
+        btnLabel: s.cleared[p.n] ? "✓ Cleared" : "Mark cleared",
+        toggle: () => this.setState(st => ({ cleared: Object.assign({}, st.cleared, { [p.n]: !st.cleared[p.n] }) }))
+      })),
+      phasesDone: clearedCount,
+      hoursTotal: 600,
+      skills: SKILLS.map(sk => ({
+        name: sk.name, level: sk.level, note: sk.note, tagClass: this.tagFor(sk.level),
+        links: sk.links.map(l => ({ kind: l[0], label: l[1], url: l[2] }))
+      })),
+      mobileTabs: ["Today", "Streak", "Path", "Links"].map((l, i) => ({ label: l, color: i === 0 ? ACCENT : "var(--color-neutral-600)" })),
+      nudge: doneQ.length >= QUESTS.length - 2
+        ? "One quest left. Fifteen minutes and day 48 is yours."
+        : "Three quests open and three hours left. Pick the smallest one — a green day beats a perfect plan."
+    };
+  }
+}
+</script>
+</body>
+</html>
