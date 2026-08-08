@@ -24,6 +24,9 @@ export default function App() {
     addSkillNote,
     updateSkillNote,
     removeSkillNote,
+    addCustomQuest,
+    updateCustomQuest,
+    removeCustomQuest,
   } = useAppState();
   const d = useDerived(data, screen);
 
@@ -68,6 +71,9 @@ export default function App() {
             questMode={d.questMode}
             fullModeUnlocked={d.fullModeUnlocked}
             onSetQuestMode={setQuestMode}
+            onAddQuest={addCustomQuest}
+            onUpdateQuest={updateCustomQuest}
+            onRemoveQuest={removeCustomQuest}
           />
         )}
 

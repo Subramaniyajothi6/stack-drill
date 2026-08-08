@@ -278,6 +278,120 @@
   text-align: right;
 }
 
+/* — user-added quests — */
+
+.quest-row-wrap {
+  border-bottom: 1px solid var(--color-neutral-300);
+}
+.quest-row-wrap .quest-row { border-bottom: 0; }
+
+.quest-own-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px 10px 66px;
+  font-size: 11px;
+}
+.quest-own-badge {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-700);
+  border: 1px solid var(--color-accent-300);
+  padding: 1px 6px;
+}
+.quest-own-actions button {
+  font-size: 11px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-neutral-600);
+}
+.quest-own-actions button:hover { color: var(--color-accent-700); }
+.quest-own-actions button.quest-confirm-remove {
+  color: var(--color-accent-700);
+  font-weight: 700;
+}
+
+.add-quest-toggle {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--color-accent-700);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 12px 0 0;
+  text-align: left;
+}
+.add-quest-toggle:hover { text-decoration: underline; }
+
+.quest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-neutral-300);
+}
+.quest-form input {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 9px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  color: var(--color-text);
+  width: 100%;
+}
+.quest-form-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+}
+.quest-form input:focus-visible {
+  border-color: var(--color-accent);
+  outline-offset: 0;
+}
+.quest-form-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.quest-form-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 88px;
+}
+.quest-form-row label span {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-neutral-600);
+}
+.quest-form-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.quest-form-actions button {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 12px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: 0;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.quest-form-actions button:hover { background: var(--color-accent-600); }
+.quest-form-actions button.quest-cancel {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-divider);
+}
+.quest-form-actions button.quest-cancel:hover { background: var(--color-neutral-200); }
+
 .coach-box {
   margin-top: 28px;
   border: 2px solid var(--color-divider);

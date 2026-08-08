@@ -17,12 +17,14 @@ import type { Badge, Quest, Screen } from "../data/types";
 
 export interface QuestVM extends Quest {
   on: boolean;
+  /** True for user-added quests — only those get edit/delete controls. */
+  custom: boolean;
 }
 
-const ALL_QUESTS_BY_ID = new Map<string, Quest>([
+const BUILT_IN_QUESTS: readonly (readonly [string, Quest])[] = [
   ...QUESTS_FULL.map((q) => [q.id, q] as const),
-  [ONE_HOUR_QUEST.id, ONE_HOUR_QUEST],
-]);
+  [ONE_HOUR_QUEST.id, ONE_HOUR_QUEST] as const,
+];
 
 /** Consecutive active days ending today. If today has nothing logged yet,
  * counts back from yesterday instead of zeroing out mid-day. */
@@ -56,16 +58,27 @@ function computeLongestStreak(history: Record<string, string[]>): number {
 export function useDerived(data: StoredData, screen: Screen) {
   return useMemo(() => {
     const today = todayKey();
-    const questSet: Quest[] = data.questMode === "full" ? QUESTS_FULL : [ONE_HOUR_QUEST];
+    const builtIn: Quest[] = data.questMode === "full" ? QUESTS_FULL : [ONE_HOUR_QUEST];
+    // Your own quests show in either mode — adding one is an explicit choice,
+    // so one-hour mode stays the untouched default rather than a cap.
+    const mine = data.customQuests.filter((q) => !q.archived);
+    const questSet: Quest[] = [...builtIn, ...mine];
     const doneIds = new Set(data.history[today] ?? []);
-    const quests: QuestVM[] = questSet.map((q) => ({ ...q, on: doneIds.has(q.id) }));
+    const quests: QuestVM[] = questSet.map((q) => ({
+      ...q,
+      on: doneIds.has(q.id),
+      custom: q.id.startsWith("custom-"),
+    }));
     const doneQ = quests.filter((q) => q.on);
+
+    // Archived quests stay in the lookup so XP already earned still resolves.
+    const questsById = new Map<string, Quest>([...BUILT_IN_QUESTS, ...data.customQuests.map((q) => [q.id, q] as const)]);
 
     let xp = 0;
     let totalCompletions = 0;
     for (const ids of Object.values(data.history)) {
       for (const id of ids) {
-        const q = ALL_QUESTS_BY_ID.get(id);
+        const q = questsById.get(id);
         if (q) {
           xp += q.xp;
           totalCompletions++;
@@ -88,11 +101,20 @@ export function useDerived(data: StoredData, screen: Screen) {
     const dayNumber = daysBetween(data.startDate, today) + 1;
     const weekNumber = Math.min(20, Math.ceil(dayNumber / 7));
 
+    const plannedHours = data.questMode === "onehour" ? 1 : 6;
+    const remaining = questSet.length - doneQ.length;
+    // In one-hour mode the focused hour is the actual bar, so the line keys off
+    // that specifically — ticking a custom quest first shouldn't claim it's done.
+    const hourDone = doneIds.has(ONE_HOUR_QUEST.id);
     const coachLine =
       data.questMode === "onehour"
-        ? doneQ.length > 0
-          ? "Hour's in. That's the whole target for today — anything else is a bonus."
-          : "Nothing logged yet. One hour, whenever you can fit it — that's the entire bar today."
+        ? doneQ.length === 0
+          ? "Nothing logged yet. One hour, whenever you can fit it — that's the entire bar today."
+          : remaining === 0
+            ? "Everything on today's list is done. That's the bar cleared — anything else is a bonus."
+            : hourDone
+              ? `Hour's in — the bar is cleared. ${remaining} of your own left if you want ${remaining === 1 ? "it" : "them"}.`
+              : "Good start, but the focused hour is the one that actually moves the phase. Take it next."
         : doneQ.length === 0
           ? "Nothing checked yet. Open the project and do fifteen minutes — the rest of the day follows the first block, not your mood."
           : doneQ.length < 4
@@ -118,8 +140,10 @@ export function useDerived(data: StoredData, screen: Screen) {
       questCount: questSet.length,
       doneCount: doneQ.length,
       todayPct: Math.round((doneQ.length / questSet.length) * 100),
-      plannedHours: data.questMode === "onehour" ? 1 : 6,
-      loggedHours: data.questMode === "onehour" ? (doneQ.length ? "1.0" : "0.0") : (doneQ.length * 0.9).toFixed(1),
+      plannedHours,
+      // Quests carry no duration, so this is planned hours scaled by how much
+      // of the list is ticked — an estimate, not a timer.
+      loggedHours: (questSet.length ? (doneQ.length / questSet.length) * plannedHours : 0).toFixed(1),
       freezes: FREEZE_TOKENS,
       streak,
       longest,

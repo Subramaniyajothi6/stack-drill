@@ -17,7 +17,9 @@ export function Header({ kicker, title, streak, doneCount, questCount, freezes }
       <div className="page-header-stats">
         <div>
           <div className="kicker">Streak</div>
-          <div className="stat-value">{streak} days</div>
+          <div className="stat-value">
+            {streak} {streak === 1 ? "day" : "days"}
+          </div>
         </div>
         <div>
           <div className="kicker">Today</div>

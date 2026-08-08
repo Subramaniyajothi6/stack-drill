@@ -23,6 +23,16 @@ export interface Phase {
   proof: string;
 }
 
+/** A quest the user wrote themselves, alongside the built-in ones.
+ *
+ * Deleting sets `archived` rather than dropping the record: `history` stores
+ * only quest ids, so a removed definition would silently shrink past XP and
+ * change days already counted. Archived quests leave today's list but stay
+ * resolvable for everything already logged against them. */
+export interface CustomQuest extends Quest {
+  archived?: boolean;
+}
+
 export type SkillLevel = "Solid" | "Next up" | "Weak spot" | "New";
 
 export interface SkillLink {

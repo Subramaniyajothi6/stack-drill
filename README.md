@@ -23,7 +23,8 @@ is pre-seeded or faked.
 
 - **Today** — the day's quest(s), a rule-based coach line, fallback
   options for a bad day, the current roadmap phase, weak spots, and (once
-  unlocked) the full block plan.
+  unlocked) the full block plan. You can add your own quests here too,
+  with their own time, length and XP; they show in either mode.
 - **Streaks, XP & badges** — a 140-day activity heatmap and badges, all
   derived from your actual history.
 - **The roadmap** — the 8 learning phases, each with tasks, a "boss

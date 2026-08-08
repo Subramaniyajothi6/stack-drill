@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { QuestVM } from "../../state/derived";
 import { BLOCKS, FALLBACKS, WEAK } from "../../data/seed";
 import type { Phase, QuestMode } from "../../data/types";
+import { QuestForm, type QuestDraft } from "../ui/QuestForm";
 
 interface Props {
   quests: QuestVM[];
@@ -12,6 +14,9 @@ interface Props {
   questMode: QuestMode;
   fullModeUnlocked: boolean;
   onSetQuestMode: (mode: QuestMode) => void;
+  onAddQuest: (draft: QuestDraft) => void;
+  onUpdateQuest: (questId: string, draft: QuestDraft) => void;
+  onRemoveQuest: (questId: string) => void;
 }
 
 export function TodayScreen({
@@ -24,7 +29,14 @@ export function TodayScreen({
   questMode,
   fullModeUnlocked,
   onSetQuestMode,
+  onAddQuest,
+  onUpdateQuest,
+  onRemoveQuest,
 }: Props) {
+  const [addingQuest, setAddingQuest] = useState(false);
+  const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
+  const [confirmingQuestId, setConfirmingQuestId] = useState<string | null>(null);
+
   return (
     <div className="today-grid">
       <section className="today-left">
@@ -55,20 +67,74 @@ export function TodayScreen({
         </div>
 
         <div className="quest-list">
-          {quests.map((q) => (
-            <button key={q.id} className="quest-row" onClick={() => onToggleQuest(q.id)}>
-              <span className={"quest-check" + (q.on ? " done" : " pending")}>{q.on ? "✓" : ""}</span>
-              <span className="quest-body">
-                <span className={"quest-title" + (q.on ? " done" : "")}>{q.title}</span>
-                <span className="quest-detail">{q.detail}</span>
-              </span>
-              <span className="quest-meta">
-                {q.slot && <span className="tag tag-outline">{q.slot}</span>}
-                <span className="quest-xp">+{q.xp} XP</span>
-              </span>
-            </button>
-          ))}
+          {quests.map((q) =>
+            editingQuestId === q.id ? (
+              <QuestForm
+                key={q.id}
+                initial={{ title: q.title, detail: q.detail, slot: q.slot, short: q.short, xp: q.xp }}
+                submitLabel="Save"
+                onCancel={() => setEditingQuestId(null)}
+                onSubmit={(draft) => {
+                  onUpdateQuest(q.id, draft);
+                  setEditingQuestId(null);
+                }}
+              />
+            ) : (
+              <div className="quest-row-wrap" key={q.id}>
+                <button className="quest-row" onClick={() => onToggleQuest(q.id)}>
+                  <span className={"quest-check" + (q.on ? " done" : " pending")}>
+                    {q.on ? "✓" : ""}
+                  </span>
+                  <span className="quest-body">
+                    <span className={"quest-title" + (q.on ? " done" : "")}>{q.title}</span>
+                    {q.detail && <span className="quest-detail">{q.detail}</span>}
+                  </span>
+                  <span className="quest-meta">
+                    {q.slot && <span className="tag tag-outline">{q.slot}</span>}
+                    <span className="quest-xp">+{q.xp} XP</span>
+                  </span>
+                </button>
+                {q.custom && (
+                  <div className="quest-own-actions">
+                    <span className="quest-own-badge">yours</span>
+                    <button onClick={() => setEditingQuestId(q.id)}>Edit</button>
+                    {confirmingQuestId === q.id ? (
+                      <>
+                        <button
+                          className="quest-confirm-remove"
+                          onClick={() => {
+                            onRemoveQuest(q.id);
+                            setConfirmingQuestId(null);
+                          }}
+                        >
+                          Really remove
+                        </button>
+                        <button onClick={() => setConfirmingQuestId(null)}>Keep</button>
+                      </>
+                    ) : (
+                      <button onClick={() => setConfirmingQuestId(q.id)}>Remove</button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          )}
         </div>
+
+        {addingQuest ? (
+          <QuestForm
+            submitLabel="Add quest"
+            onCancel={() => setAddingQuest(false)}
+            onSubmit={(draft) => {
+              onAddQuest(draft);
+              setAddingQuest(false);
+            }}
+          />
+        ) : (
+          <button className="add-quest-toggle" onClick={() => setAddingQuest(true)}>
+            + Add your own quest
+          </button>
+        )}
 
         <div className="coach-box">
           <div className="kicker">Coach</div>

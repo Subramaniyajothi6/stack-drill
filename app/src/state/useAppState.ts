@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { load, save, type StoredData } from "../lib/storage";
 import { todayKey } from "../lib/date";
-import type { QuestMode, SkillLink } from "../data/types";
+import type { CustomQuest, QuestMode, SkillLink } from "../data/types";
 
 let linkIdSeq = 1;
 function nextLinkId() {
   return `link-${Date.now()}-${linkIdSeq++}`;
+}
+
+let questIdSeq = 1;
+function nextQuestId() {
+  return `custom-${Date.now()}-${questIdSeq++}`;
 }
 
 let noteIdSeq = 1;
@@ -41,6 +46,32 @@ export function useAppState() {
 
   const unlockFullMode = useCallback(() => {
     setData((d) => (d.fullModeUnlocked ? d : { ...d, fullModeUnlocked: true }));
+  }, []);
+
+  const addCustomQuest = useCallback((draft: Omit<CustomQuest, "id" | "archived">) => {
+    setData((d) => ({
+      ...d,
+      customQuests: [...d.customQuests, { ...draft, id: nextQuestId() }],
+    }));
+  }, []);
+
+  const updateCustomQuest = useCallback(
+    (questId: string, patch: Omit<CustomQuest, "id" | "archived">) => {
+      setData((d) => ({
+        ...d,
+        customQuests: d.customQuests.map((q) => (q.id === questId ? { ...q, ...patch } : q)),
+      }));
+    },
+    []
+  );
+
+  /** Archives rather than deletes — see the CustomQuest docstring for why
+   * dropping the record would corrupt past XP and streak days. */
+  const removeCustomQuest = useCallback((questId: string) => {
+    setData((d) => ({
+      ...d,
+      customQuests: d.customQuests.map((q) => (q.id === questId ? { ...q, archived: true } : q)),
+    }));
   }, []);
 
   const addSkillLink = useCallback((skillName: string, link: Omit<SkillLink, "id">) => {
@@ -132,5 +163,8 @@ export function useAppState() {
     addSkillNote,
     updateSkillNote,
     removeSkillNote,
+    addCustomQuest,
+    updateCustomQuest,
+    removeCustomQuest,
   };
 }

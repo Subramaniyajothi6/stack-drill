@@ -1,4 +1,4 @@
-import type { QuestMode, Skill } from "../data/types";
+import type { CustomQuest, QuestMode, Skill } from "../data/types";
 import { PHASES, SKILLS } from "../data/seed";
 import { todayKey } from "./date";
 
@@ -15,6 +15,8 @@ export interface StoredData {
   history: Record<string, string[]>;
   cleared: Record<string, boolean>;
   skills: Skill[];
+  /** Quests the user added themselves; shown alongside the built-in set. */
+  customQuests: CustomQuest[];
 }
 
 function defaultData(): StoredData {
@@ -26,6 +28,7 @@ function defaultData(): StoredData {
     cleared: Object.fromEntries(PHASES.map((p) => [p.n, false])),
     // Notes start empty — they're yours to write, nothing is seeded.
     skills: SKILLS.map((sk) => ({ ...sk, notes: [] })),
+    customQuests: [],
   };
 }
 
@@ -49,6 +52,7 @@ export function load(): StoredData {
         Array.isArray(parsed.skills) && parsed.skills.length
           ? parsed.skills.map((sk: Skill) => ({ ...sk, notes: sk.notes ?? [] }))
           : fallback.skills,
+      customQuests: Array.isArray(parsed.customQuests) ? parsed.customQuests : [],
     };
   } catch {
     return fallback;
