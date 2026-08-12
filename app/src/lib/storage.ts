@@ -1,5 +1,5 @@
-import type { CustomQuest, QuestMode, Skill } from "../data/types";
-import { PHASES, SKILLS } from "../data/seed";
+import type { CustomQuest, QuestMode, Skill, WeakSpot } from "../data/types";
+import { PHASES, SKILLS, WEAK } from "../data/seed";
 import { todayKey } from "./date";
 
 const STORAGE_KEY = "stack-drill:v2";
@@ -17,6 +17,8 @@ export interface StoredData {
   skills: Skill[];
   /** Quests the user added themselves; shown alongside the built-in set. */
   customQuests: CustomQuest[];
+  /** Editable — seeded from real drill scores, updated as you re-drill. */
+  weakSpots: WeakSpot[];
 }
 
 function defaultData(): StoredData {
@@ -29,7 +31,20 @@ function defaultData(): StoredData {
     // Notes start empty — they're yours to write, nothing is seeded.
     skills: SKILLS.map((sk) => ({ ...sk, notes: [] })),
     customQuests: [],
+    weakSpots: WEAK,
   };
+}
+
+/** Your saved skills win — they carry your links and notes — but skills added
+ * to the seed catalog since you last saved get appended rather than dropped.
+ * Without this, a returning user never sees newly shipped skills at all.
+ * A skill you deleted stays deleted only until the seed changes; the catalog
+ * is app-owned, unlike the links and notes inside it. */
+function mergeSkills(saved: unknown, seeded: Skill[]): Skill[] {
+  if (!Array.isArray(saved) || saved.length === 0) return seeded;
+  const normalised: Skill[] = saved.map((sk: Skill) => ({ ...sk, notes: sk.notes ?? [] }));
+  const savedNames = new Set(normalised.map((sk) => sk.name));
+  return [...normalised, ...seeded.filter((sk) => !savedNames.has(sk.name))];
 }
 
 /** The only function in this app allowed to read localStorage. */
@@ -48,11 +63,9 @@ export function load(): StoredData {
           ? parsed.history
           : {},
       cleared: { ...fallback.cleared, ...(parsed.cleared ?? {}) },
-      skills:
-        Array.isArray(parsed.skills) && parsed.skills.length
-          ? parsed.skills.map((sk: Skill) => ({ ...sk, notes: sk.notes ?? [] }))
-          : fallback.skills,
+      skills: mergeSkills(parsed.skills, fallback.skills),
       customQuests: Array.isArray(parsed.customQuests) ? parsed.customQuests : [],
+      weakSpots: Array.isArray(parsed.weakSpots) ? parsed.weakSpots : fallback.weakSpots,
     };
   } catch {
     return fallback;

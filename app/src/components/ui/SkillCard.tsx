@@ -66,6 +66,7 @@ interface Props {
   onAddNote: (skillName: string, title: string, body: string) => void;
   onUpdateNote: (skillName: string, noteId: string, title: string, body: string) => void;
   onRemoveNote: (skillName: string, noteId: string) => void;
+  onToggleLinkDone: (skillName: string, linkId: string) => void;
 }
 
 export function SkillCard({
@@ -76,7 +77,9 @@ export function SkillCard({
   onAddNote,
   onUpdateNote,
   onRemoveNote,
+  onToggleLinkDone,
 }: Props) {
+  const doneCount = skill.links.filter((l) => l.done).length;
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -87,6 +90,11 @@ export function SkillCard({
         <span className={tagClassFor(skill.level)}>{skill.level}</span>
       </div>
       <div className="note">{skill.note}</div>
+      {doneCount > 0 && (
+        <div className="skill-progress">
+          {doneCount} of {skill.links.length} done
+        </div>
+      )}
       <div className="skill-links">
         {skill.links.map((l: SkillLink) =>
           editingId === l.id ? (
@@ -102,11 +110,21 @@ export function SkillCard({
               />
             </div>
           ) : (
-            <div className="skill-link" key={l.id}>
+            <div className={"skill-link" + (l.done ? " link-done" : "")} key={l.id}>
               <span className="kind">{l.kind}</span>
-              <a href={l.url} target="_blank" rel="noopener noreferrer">
-                {l.label}
-              </a>
+              <span className="link-main">
+                <button
+                  className={"link-tick" + (l.done ? " on" : "")}
+                  onClick={() => onToggleLinkDone(skill.name, l.id)}
+                  title={l.done ? "Mark as not done" : "Mark as done"}
+                  aria-pressed={!!l.done}
+                >
+                  {l.done ? "✓" : ""}
+                </button>
+                <a href={l.url} target="_blank" rel="noopener noreferrer">
+                  {l.label}
+                </a>
+              </span>
               <span style={{ display: "flex", gap: 4 }}>
                 <button className="remove-link" onClick={() => setEditingId(l.id)} title="Edit link">
                   Edit

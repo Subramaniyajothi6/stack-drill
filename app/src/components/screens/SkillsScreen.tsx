@@ -15,6 +15,7 @@ interface Props {
   onAddNote: (skillName: string, title: string, body: string) => void;
   onUpdateNote: (skillName: string, noteId: string, title: string, body: string) => void;
   onRemoveNote: (skillName: string, noteId: string) => void;
+  onToggleLinkDone: (skillName: string, linkId: string) => void;
 }
 
 export function SkillsScreen({
@@ -25,6 +26,7 @@ export function SkillsScreen({
   onAddNote,
   onUpdateNote,
   onRemoveNote,
+  onToggleLinkDone,
 }: Props) {
   const noteCount = skills.reduce((n, s) => n + (s.notes?.length ?? 0), 0);
 
@@ -51,6 +53,7 @@ export function SkillsScreen({
             onAddNote={onAddNote}
             onUpdateNote={onUpdateNote}
             onRemoveNote={onRemoveNote}
+            onToggleLinkDone={onToggleLinkDone}
           />
         ))}
       </div>

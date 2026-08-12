@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { load, save, type StoredData } from "../lib/storage";
 import { todayKey } from "../lib/date";
-import type { CustomQuest, QuestMode, SkillLink } from "../data/types";
+import type { CustomQuest, QuestMode, SkillLink, WeakSpot } from "../data/types";
 
 let linkIdSeq = 1;
 function nextLinkId() {
@@ -46,6 +46,30 @@ export function useAppState() {
 
   const unlockFullMode = useCallback(() => {
     setData((d) => (d.fullModeUnlocked ? d : { ...d, fullModeUnlocked: true }));
+  }, []);
+
+  const toggleLinkDone = useCallback((skillName: string, linkId: string) => {
+    setData((d) => ({
+      ...d,
+      skills: d.skills.map((sk) =>
+        sk.name === skillName
+          ? { ...sk, links: sk.links.map((l) => (l.id === linkId ? { ...l, done: !l.done } : l)) }
+          : sk
+      ),
+    }));
+  }, []);
+
+  const upsertWeakSpot = useCallback((spot: WeakSpot) => {
+    setData((d) => ({
+      ...d,
+      weakSpots: d.weakSpots.some((w) => w.id === spot.id)
+        ? d.weakSpots.map((w) => (w.id === spot.id ? spot : w))
+        : [...d.weakSpots, spot],
+    }));
+  }, []);
+
+  const removeWeakSpot = useCallback((id: string) => {
+    setData((d) => ({ ...d, weakSpots: d.weakSpots.filter((w) => w.id !== id) }));
   }, []);
 
   const addCustomQuest = useCallback((draft: Omit<CustomQuest, "id" | "archived">) => {
@@ -166,5 +190,8 @@ export function useAppState() {
     addCustomQuest,
     updateCustomQuest,
     removeCustomQuest,
+    toggleLinkDone,
+    upsertWeakSpot,
+    removeWeakSpot,
   };
 }

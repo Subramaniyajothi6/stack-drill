@@ -37,6 +37,24 @@ export const QUESTS_FULL: Quest[] = [
 ];
 
 export const PHASES: Phase[] = [
+  {
+    n: "00",
+    weeks: "Now — until you sign",
+    hours: "Ongoing",
+    xp: 800,
+    title: "Interview readiness",
+    why: "Job first, freelance as the six-month aim. Your drill sets came in at 40/100 and 35/100 — that's a recall-under-pressure problem, not a knowledge problem, and it's fixed by retrieval practice, not re-reading.",
+    tasks: [
+      "Re-drill set 1 (JS · React · Node/Express) until 80+, closed-book",
+      "Re-drill set 2 (MongoDB · SQL · TypeScript) until 80+, closed-book",
+      "Read prep/12-doubts-and-mistakes.md before every interview, no exceptions",
+      "Two DSA problems a day with the pattern named out loud",
+      "Explain your project end to end in 3 minutes, timed, from memory",
+      "Log every question you were asked within an hour of leaving the room",
+    ],
+    boss: "A mock scoring 45+/60 across all six rows, then a real offer.",
+    proof: "The prep repo itself — twelve files of drills, mistakes and scripts.",
+  },
   { n: "01", weeks: "Weeks 1–3", hours: "90h", xp: 900, title: "TypeScript, properly", why: "Almost every paid React/Node contract is TypeScript now. Coming from JS this is your fastest rate increase, so it goes first.", tasks: ["Handbook: narrowing, generics, utility types, discriminated unions", "Convert one existing MERN repo to strict TS, front to back", "Validate every API edge with Zod instead of trusting types"], boss: "Your old project running in strict mode with zero `any`.", proof: "A typed repo you can hand a client to read." },
   { n: "02", weeks: "Weeks 4–6", hours: "90h", xp: 950, title: "Next.js: App Router, server actions, auth", why: "Clients ask for Next by name. Server components change how you think about data fetching, so give it real weeks, not a weekend.", tasks: ["Official Learn course end to end, typed", "Rebuild one React SPA as App Router with server actions", "Auth, protected routes, image + metadata, deploy to Vercel"], boss: "A live, SEO-clean Next app with login and a real database behind it.", proof: "A URL you can put at the top of a proposal." },
   { n: "03", weeks: "Weeks 7–8", hours: "60h", xp: 700, title: "Postgres + Drizzle ORM", why: "You know Mongo. Most agency work is relational. Knowing both, and being able to argue for one, is what a senior freelancer does.", tasks: ["SQL fundamentals: joins, indexes, transactions, EXPLAIN", "Drizzle schema, relations, migrations on Neon or Supabase", "Migrate one Mongoose model set to Postgres and compare queries"], boss: "Same app, both databases, a written note on which you'd bill for and why.", proof: "A short write-up — instant credibility on calls." },
@@ -47,8 +65,17 @@ export const PHASES: Phase[] = [
   { n: "08", weeks: "Weeks 19–20", hours: "60h", xp: 900, title: "PyTorch basics + capstone", why: "Enough PyTorch to read papers and fine-tune small models, then one flagship build that ties the whole stack together.", tasks: ["Tensors, autograd, training loop, fine-tune a small model", "Capstone: Next + TS + FastAPI + Postgres + RAG, deployed on AWS", "Write the case study: problem, decisions, numbers, what you'd charge"], boss: "Capstone live, case study published, three cold proposals sent.", proof: "First paid client conversation." },
 ];
 
-function links(id: string, raw: [string, string, string][]) {
-  return raw.map(([kind, label, url], i) => ({ id: `${id}-${i}`, kind, label, url }));
+/** `[kind, label, url]`, or `[kind, label, url, true]` for already finished. */
+type RawLink = [string, string, string] | [string, string, string, boolean];
+
+function links(id: string, raw: RawLink[]) {
+  return raw.map(([kind, label, url, done], i) => ({
+    id: `${id}-${i}`,
+    kind,
+    label,
+    url,
+    done: done ?? false,
+  }));
 }
 
 export const SKILLS: Skill[] = [
@@ -66,13 +93,42 @@ export const SKILLS: Skill[] = [
   { name: "Python", level: "New", note: "Phase 06. One week of syntax, then straight into FastAPI — you already know backends.", links: links("python", [["Docs", "Python tutorial", "https://docs.python.org/3/tutorial/"], ["Docs", "FastAPI tutorial", "https://fastapi.tiangolo.com/tutorial/"], ["Course", "Real Python basics path", "https://realpython.com/learning-paths/python-basics/"]]) },
   { name: "AI, ML & RAG", level: "New", note: "Phase 07. Ship a RAG app before touching theory; the theory sticks better afterwards.", links: links("ai", [["Course", "Hugging Face LLM course", "https://huggingface.co/learn/llm-course"], ["Docs", "LangChain RAG tutorial", "https://python.langchain.com/docs/tutorials/rag/"], ["Watch", "Andrej Karpathy — LLM intro", "https://www.youtube.com/watch?v=zjkBMFhNj_g"]]) },
   { name: "PyTorch", level: "New", note: "Phase 08. Enough to fine-tune and to read a paper without panic.", links: links("pytorch", [["Docs", "PyTorch tutorials", "https://pytorch.org/tutorials/"], ["Course", "fast.ai practical deep learning", "https://course.fast.ai/"], ["Watch", "Karpathy — building makemore", "https://www.youtube.com/watch?v=PaCmpygFfXo"]]) },
+  {
+    name: "Claude & AI tooling",
+    level: "Next up",
+    note: "Anthropic's own free courses. Being fast with these tools is itself a sellable skill now — tick each one off as you finish it.",
+    links: links("skilljar", [
+      ["Course", "Claude Code in Action", "https://anthropic.skilljar.com/claude-code-in-action", true],
+      ["Course", "Claude Code 101", "https://anthropic.skilljar.com/claude-code-101"],
+      ["Course", "Claude 101", "https://anthropic.skilljar.com/claude-101"],
+      ["Course", "Building with the Claude API", "https://anthropic.skilljar.com/claude-with-the-anthropic-api"],
+      ["Course", "Introduction to Model Context Protocol", "https://anthropic.skilljar.com/introduction-to-model-context-protocol"],
+      ["Course", "MCP: Advanced Topics", "https://anthropic.skilljar.com/model-context-protocol-advanced-topics"],
+      ["Course", "Introduction to agent skills", "https://anthropic.skilljar.com/introduction-to-agent-skills"],
+      ["Course", "Introduction to subagents", "https://anthropic.skilljar.com/introduction-to-subagents"],
+      ["Course", "AI Fluency: Framework & Foundations", "https://anthropic.skilljar.com/ai-fluency-framework-foundations"],
+      ["Catalog", "All Anthropic courses", "https://anthropic.skilljar.com/"],
+    ]),
+  },
+  {
+    name: "Interview readiness",
+    level: "Weak spot",
+    note: "Your prep lives in RoutineKraft/prep. Drill sets scored 40/100 and 35/100 — the gap is recall under pressure, not knowledge.",
+    links: links("interview", [
+      ["Practice", "NeetCode 150", "https://neetcode.io/practice"],
+      ["Practice", "LeetCode top interview 150", "https://leetcode.com/studyplan/top-interview-150/"],
+      ["Practice", "PostgreSQL Exercises", "https://pgexercises.com/"],
+      ["Reference", "JS interview questions, 30 seconds of code", "https://www.30secondsofcode.org/js/p/1"],
+      ["Reference", "React interview questions", "https://github.com/sudheerj/reactjs-interview-questions"],
+    ]),
+  },
 ];
 
+/** Seeded from real drill scores in RoutineKraft/prep/11-concept-revision.md.
+ * Everything here is editable in the app — update it as you re-drill. */
 export const WEAK: WeakSpot[] = [
-  { name: "DSA", pct: 24, note: "12 of 50 problems" },
-  { name: "AWS / deployment", pct: 15, note: "Phase 05, not started" },
-  { name: "TypeScript generics", pct: 45, note: "Shaky under pressure" },
-  { name: "Writing tests", pct: 20, note: "Skipped 4 weeks running" },
+  { id: "weak-set1", name: "JS · React · Node/Express", pct: 40, note: "Drill set 1 — 40/100" },
+  { id: "weak-set2", name: "MongoDB · SQL · TypeScript", pct: 35, note: "Drill set 2 — 35/100" },
 ];
 
 export const FALLBACKS: Fallback[] = [

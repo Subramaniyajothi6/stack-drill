@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { QuestVM } from "../../state/derived";
-import { BLOCKS, FALLBACKS, WEAK } from "../../data/seed";
-import type { Phase, QuestMode } from "../../data/types";
+import { BLOCKS, FALLBACKS } from "../../data/seed";
+import type { Phase, QuestMode, WeakSpot } from "../../data/types";
 import { QuestForm, type QuestDraft } from "../ui/QuestForm";
+import { WeakSpots } from "../ui/WeakSpots";
 
 interface Props {
   quests: QuestVM[];
@@ -17,6 +18,9 @@ interface Props {
   onAddQuest: (draft: QuestDraft) => void;
   onUpdateQuest: (questId: string, draft: QuestDraft) => void;
   onRemoveQuest: (questId: string) => void;
+  weakSpots: WeakSpot[];
+  onUpsertWeakSpot: (spot: WeakSpot) => void;
+  onRemoveWeakSpot: (id: string) => void;
 }
 
 export function TodayScreen({
@@ -32,6 +36,9 @@ export function TodayScreen({
   onAddQuest,
   onUpdateQuest,
   onRemoveQuest,
+  weakSpots,
+  onUpsertWeakSpot,
+  onRemoveWeakSpot,
 }: Props) {
   const [addingQuest, setAddingQuest] = useState(false);
   const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
@@ -167,24 +174,7 @@ export function TodayScreen({
           </div>
         </div>
 
-        <div>
-          <h3 className="section-title" style={{ marginBottom: 8 }}>
-            Weak spots
-          </h3>
-          <div className="weak-spots">
-            {WEAK.map((w) => (
-              <div key={w.name}>
-                <div className="weak-spot-row">
-                  <span className="weak-spot-name">{w.name}</span>
-                  <span className="weak-spot-note">{w.note}</span>
-                </div>
-                <div className="weak-bar-track">
-                  <div className="weak-bar-fill" style={{ width: `${w.pct}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <WeakSpots spots={weakSpots} onUpsert={onUpsertWeakSpot} onRemove={onRemoveWeakSpot} />
 
         {questMode === "full" && (
           <div>

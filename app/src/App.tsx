@@ -27,6 +27,9 @@ export default function App() {
     addCustomQuest,
     updateCustomQuest,
     removeCustomQuest,
+    toggleLinkDone,
+    upsertWeakSpot,
+    removeWeakSpot,
   } = useAppState();
   const d = useDerived(data, screen);
 
@@ -74,6 +77,9 @@ export default function App() {
             onAddQuest={addCustomQuest}
             onUpdateQuest={updateCustomQuest}
             onRemoveQuest={removeCustomQuest}
+            weakSpots={data.weakSpots}
+            onUpsertWeakSpot={upsertWeakSpot}
+            onRemoveWeakSpot={removeWeakSpot}
           />
         )}
 
@@ -99,6 +105,7 @@ export default function App() {
             onAddNote={addSkillNote}
             onUpdateNote={updateSkillNote}
             onRemoveNote={removeSkillNote}
+            onToggleLinkDone={toggleLinkDone}
           />
         )}
       </main>

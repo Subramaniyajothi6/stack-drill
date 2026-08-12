@@ -40,6 +40,9 @@ export interface SkillLink {
   kind: string;
   label: string;
   url: string;
+  /** Ticked off once you've finished it — courses are worth tracking, not
+   * just collecting. Optional so links saved before this field still parse. */
+  done?: boolean;
 }
 
 /** A note written by the user in their own words — the "my version" of a
@@ -64,7 +67,9 @@ export interface Skill {
 }
 
 export interface WeakSpot {
+  id: string;
   name: string;
+  /** 0–100. Your honest read or a real drill score, not a generated number. */
   pct: number;
   note: string;
 }

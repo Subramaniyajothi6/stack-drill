@@ -129,7 +129,8 @@ export function useDerived(data: StoredData, screen: Screen) {
       { name: "Typed", how: "Clear phase 01 — TypeScript.", earned: !!data.cleared["01"] },
       { name: "Pattern hunter", how: "Clear phase 04 — the DSA sprint.", earned: !!data.cleared["04"] },
       { name: "Deployed", how: "Clear phase 05 — AWS + shipping.", earned: !!data.cleared["05"] },
-      { name: "Capstone shipped", how: "Clear all eight phases.", earned: clearedCount === PHASES.length },
+      { name: "Hired", how: "Clear phase 00 — interview readiness.", earned: !!data.cleared["00"] },
+      { name: "Capstone shipped", how: `Clear all ${PHASES.length} phases.`, earned: clearedCount === PHASES.length },
     ];
 
     return {

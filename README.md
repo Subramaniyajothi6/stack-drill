@@ -19,12 +19,17 @@ Everything — streaks, XP, levels, badges, and the activity heatmap — is
 computed from your real check-ins, starting at zero on day one. Nothing
 is pre-seeded or faked.
 
+The roadmap opens with **phase 00, Interview readiness** — job first,
+freelance as the six-month aim — followed by the eight-phase freelance
+path.
+
 ## Features
 
 - **Today** — the day's quest(s), a rule-based coach line, fallback
   options for a bad day, the current roadmap phase, weak spots, and (once
   unlocked) the full block plan. You can add your own quests here too,
-  with their own time, length and XP; they show in either mode.
+  with their own time, length and XP; they show in either mode. Weak
+  spots are editable — seeded from real drill scores, not invented ones.
 - **Streaks, XP & badges** — a 140-day activity heatmap and badges, all
   derived from your actual history.
 - **The roadmap** — the 8 learning phases, each with tasks, a "boss

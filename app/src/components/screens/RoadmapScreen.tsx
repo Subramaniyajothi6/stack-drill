@@ -1,5 +1,6 @@
 import { PHASES } from "../../data/seed";
 
+
 interface Props {
   cleared: Record<string, boolean>;
   clearedCount: number;
@@ -12,9 +13,11 @@ export function RoadmapScreen({ cleared, clearedCount, hoursTotal, onTogglePhase
     <div className="roadmap-page">
       <div className="section-title-row">
         <h3 className="section-title" style={{ border: 0, padding: 0, margin: 0 }}>
-          Eight phases, {hoursTotal} hours, one freelance-ready stack
+          Interview-ready now, freelance-ready in {hoursTotal} hours
         </h3>
-        <span className="section-meta">{clearedCount} of 8 phases cleared · tap a phase to mark it</span>
+        <span className="section-meta">
+          {clearedCount} of {PHASES.length} phases cleared · tap a phase to mark it
+        </span>
       </div>
 
       <div className="roadmap-list">
